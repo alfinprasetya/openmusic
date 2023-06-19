@@ -1,13 +1,16 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+require('dotenv').config();
+
 const Hapi = require('@hapi/hapi');
 const albums = require('./api/albums');
-const AlbumService = require('./services/inMemory/AlbumService');
+const AlbumService = require('./services/postgres/AlbumService');
 const { AlbumValidator } = require('./validator');
 
 const init = async () => {
   const albumService = new AlbumService();
   const server = Hapi.server({
-    port: 5000,
-    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
+    port: process.env.PORT,
+    host: process.env.HOST,
     routes: {
       cors: {
         origin: ['*'],
