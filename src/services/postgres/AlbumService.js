@@ -50,7 +50,7 @@ class AlbumService {
 
     return {
       ...albumResult.rows[0],
-      'songs': songResult.rows,
+      songs: songResult.rows,
     };
   }
 
