@@ -1,17 +1,27 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
-const albums = require('./api/albums');
-const songs = require('./api/songs');
-const AlbumService = require('./services/postgres/AlbumService');
-const SongService = require('./services/postgres/SongService');
-const { AlbumValidator, SongValidator } = require('./validator');
 const ClientError = require('./exceptions/ClientError');
+
+// Albums Plugin
+const albums = require('./api/albums');
+const AlbumService = require('./services/postgres/AlbumService');
+const AlbumValidator = require('./validator/albums');
+
+// Songs Plugin
+const songs = require('./api/songs');
+const SongService = require('./services/postgres/SongService');
+const SongValidator = require('./validator/songs');
+
+// Users Plugin
+const users = require('./api/users');
+const UserService = require('./services/postgres/UserService');
+const UserValidator = require('./validator/users');
 
 const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongService();
+  const userService = new UserService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -35,6 +45,13 @@ const init = async () => {
       options: {
         service: songService,
         validator: SongValidator,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: userService,
+        validator: UserValidator,
       },
     },
   ]);
@@ -67,8 +84,6 @@ const init = async () => {
   });
 
   await server.start();
-  // eslint-disable-next-line no-console
-  console.log(`Server berjalan pada ${server.info.uri}`);
 };
 
 init();
