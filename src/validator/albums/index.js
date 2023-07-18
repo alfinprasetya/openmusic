@@ -3,9 +3,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 
 const AlbumValidator = {
   validateAlbumPayload: (payload) => {
-    const valdationResult = AlbumPayloadSchema.validate(payload);
-    if (valdationResult.error) {
-      throw new InvariantError(valdationResult.error.message);
+    const validationResult = AlbumPayloadSchema.validate(payload);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
     }
   },
 };

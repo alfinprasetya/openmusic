@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 const ClientError = require('./exceptions/ClientError');
 
 // Albums Plugin
@@ -18,7 +19,12 @@ const users = require('./api/users');
 const UserService = require('./services/postgres/UserService');
 const UserValidator = require('./validator/users');
 
-// authentications
+// Playlists Plugin
+const playlists = require('./api/playlists');
+const PlaylistService = require('./services/postgres/PlaylistService');
+const PlaylistValidator = require('./validator/playlists');
+
+// Authentications
 const authentications = require('./api/authentications');
 const AuthenticationService = require('./services/postgres/AuthenticationService');
 const TokenManager = require('./tokenize/TokenManager');
@@ -28,6 +34,7 @@ const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongService();
   const userService = new UserService();
+  const playlistService = new PlaylistService();
   const authenticationService = new AuthenticationService();
 
   const server = Hapi.server({
@@ -38,6 +45,30 @@ const init = async () => {
         origin: ['*'],
       },
     },
+  });
+
+  // registrasi plugin eksternal
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // mendefinisikan strategy autentikasi jwt
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
   });
 
   await server.register([
@@ -60,6 +91,13 @@ const init = async () => {
       options: {
         service: userService,
         validator: UserValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistService,
+        validator: PlaylistValidator,
       },
     },
     {

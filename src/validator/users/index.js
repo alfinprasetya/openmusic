@@ -3,9 +3,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 
 const UserValidator = {
   validateUserPayload: (payload) => {
-    const valdationResult = UserPayloadSchema.validate(payload);
-    if (valdationResult.error) {
-      throw new InvariantError(valdationResult.error.message);
+    const validationResult = UserPayloadSchema.validate(payload);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message);
     }
   },
 };

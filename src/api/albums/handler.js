@@ -1,4 +1,4 @@
-class AlbumsHandler {
+class AlbumHandler {
   constructor(service, validator) {
     this.service = service;
     this.validator = validator;
@@ -64,4 +64,4 @@ class AlbumsHandler {
   }
 }
 
-module.exports = AlbumsHandler;
+module.exports = AlbumHandler;
