@@ -46,10 +46,10 @@ class PlaylistHandler {
   }
 
   async deletePlaylistHandler(request) {
-    const { id } = request.params;
+    const { id: playlistId } = request.params;
     const { id: owner } = request.auth.credentials;
-    await this.playlistService.verifyPlaylistOwner(id, owner);
-    await this.playlistService.deletePlaylistById(id);
+    await this.playlistService.verifyPlaylistOwner(playlistId, owner);
+    await this.playlistService.deletePlaylistById(playlistId);
 
     return {
       status: 'success',
@@ -62,10 +62,10 @@ class PlaylistHandler {
 
     const { songId } = request.payload;
     const { id: playlistId } = request.params;
-    const { id: owner } = request.auth.credentials;
+    const { id: userId } = request.auth.credentials;
 
     await this.songService.getSongById(songId);
-    await this.playlistService.verifyPlaylistOwner(playlistId, owner);
+    await this.playlistService.verifyPlaylistAccess(playlistId, userId);
     await this.playlistSongService.addPlaylistSong(playlistId, songId);
 
     const response = h.response({
@@ -77,12 +77,12 @@ class PlaylistHandler {
   }
 
   async getPlaylistSongsHandler(request) {
-    const { id: owner } = request.auth.credentials;
-    const { id } = request.params;
+    const { id: userId } = request.auth.credentials;
+    const { id: playlistId } = request.params;
 
-    await this.playlistService.verifyPlaylistOwner(id, owner);
+    await this.playlistService.verifyPlaylistAccess(playlistId, userId);
 
-    const playlist = await this.playlistService.getPlaylistById(id);
+    const playlist = await this.playlistService.getPlaylistById(playlistId);
 
     return {
       status: 'success',
@@ -93,11 +93,14 @@ class PlaylistHandler {
   }
 
   async deletePlaylistSongHandler(request) {
-    const { id: owner } = request.auth.credentials;
-    const { id: playlistId } = request.params;
-    const { songId } = request.payload;
+    this.playlistSongValidator.validatePlaylistSongPayload(request.payload);
 
-    await this.playlistService.verifyPlaylistOwner(playlistId, owner);
+    const { songId } = request.payload;
+    const { id: userId } = request.auth.credentials;
+    const { id: playlistId } = request.params;
+
+    await this.songService.getSongById(songId);
+    await this.playlistService.verifyPlaylistAccess(playlistId, userId);
     await this.playlistSongService.deletePlaylistSong(playlistId, songId);
 
     return {
