@@ -3,11 +3,14 @@ const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class PlaylistSongService {
-  constructor() {
+  constructor(songService) {
     this.pool = new Pool();
+    this.songService = songService;
   }
 
   async addPlaylistSong(playlistId, songId) {
+    await this.songService.getSongById(songId);
+
     const id = `playlist-song-${nanoid(16)}`;
 
     const query = {

@@ -41,7 +41,7 @@ const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongService();
   const userService = new UserService();
-  const playlistSongService = new PlaylistSongService();
+  const playlistSongService = new PlaylistSongService(songService);
   const authenticationService = new AuthenticationService();
   const collaborationService = new CollaborationService();
   const playlistService = new PlaylistService(collaborationService);
@@ -105,7 +105,6 @@ const init = async () => {
     {
       plugin: playlists,
       options: {
-        songService,
         playlistService,
         playlistSongService,
         playlistValidator: PlaylistValidator,
