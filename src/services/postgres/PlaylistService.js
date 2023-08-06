@@ -10,7 +10,7 @@ class PlaylistService {
     this.collaborationService = collaborationService;
   }
 
-  async addPlaylist({ name, owner }) {
+  async addPlaylist(name, owner) {
     const id = `playlist-${nanoid(16)}`;
 
     const query = {
