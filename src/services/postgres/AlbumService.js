@@ -25,6 +25,19 @@ class AlbumService {
     return result.rows[0].id;
   }
 
+  async addAlbumCover(id, filepath) {
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING cover',
+      values: [filepath, id],
+    };
+
+    const result = await this.pool.query(query);
+
+    if (!result.rows[0].cover) {
+      throw new InvariantError('Cover gagal ditambahkan');
+    }
+  }
+
   async getAlbums() {
     const result = await this.pool.query('SELECT * FROM albums');
     return result.rows;
@@ -32,7 +45,8 @@ class AlbumService {
 
   async getAlbumById(id) {
     const albumQuery = {
-      text: 'SELECT * FROM albums WHERE id = $1',
+      text: `SELECT id, name, year, cover as "coverUrl" FROM albums
+      WHERE id = $1`,
       values: [id],
     };
     const albumResult = await this.pool.query(albumQuery);
